@@ -89,6 +89,36 @@ exports.shouldEmitReceivedData = function(test){
   });
 };
 
+exports.shouldNotEmitReceivedDataOnClosedSocket = function(test){
+  test.expect(1);
+
+  requirejs(["./lib/Client","stream","through"],
+    function(Client,stream,through) {
+
+    var fakeSocket = through(
+      function write(data) {
+        this.emit('data', data)
+      },
+      function end() {
+      });
+
+    var client = new Client("test",fakeSocket);
+
+    client.on("message",function(message) {
+      test.ok(false);
+      test.done();
+    });
+
+    client.close();
+    fakeSocket.write("my-message\r\n");
+
+    setTimeout(function() {
+      test.ok(true);
+      test.done();
+    },100);
+  });
+};
+
 exports.shouldEmitASingleMessage = function(test){
   test.expect(1);
 
@@ -201,3 +231,5 @@ exports.shouldNotWriteToClosedSocket = function(test){
     },100);
   });
 };
+
+
