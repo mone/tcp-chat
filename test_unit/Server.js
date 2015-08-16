@@ -124,40 +124,41 @@ exports.shouldAcceptAndCloseClients = function(test){
   requirejs(["./lib/Server","net","./lib/util/CountDownLatch"],
     function(Server,net,CountDownLatch) {
 
-    var wait = new CountDownLatch(2,test);
-    var waitConn = new CountDownLatch(2,{
-      done: function() {
-        //clients are connected now, close server
-        server.stop();
-      }
-    });
-
     var port = nextPort;
     var server = new Server("test",port,true);
     var serverSocket = net.createServer();
     server.start(serverSocket);
 
+
+    var wait = new CountDownLatch(2,{done:function(){
+      console.log("--****************************************["+server.getClientsCount())
+      test.equals(0,server.getClientsCount());
+      test.done();
+
+    }});
+    var waitConn = new CountDownLatch(2,{
+      done: function() {
+        test.equals(2,server.getClientsCount());
+        //clients are connected now, close server
+        server.stop();
+      }
+    });
+
     var socket = new net.Socket();
     socket.connect(port, "localhost");
-
     socket.on("connect",function() {
       waitConn.countDown();
     });
-
     socket.on("close",function() {
-      test.ok(true);
       wait.countDown();
     });
 
     var socket2 = new net.Socket();
     socket2.connect(port, "localhost");
-
     socket2.on("connect",function() {
       waitConn.countDown();
     });
-
     socket2.on("close",function() {
-      test.ok(true);
       wait.countDown();
     });
   });
