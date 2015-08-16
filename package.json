@@ -1,0 +1,51 @@
+{
+  "name": "tcp-chat",
+  "version": "0.1.0",
+  "description": "whatever",
+  "keywords": [
+    "tcp",
+    "chat"
+  ],
+  "homepage": "https://github.com/mone/tcp-chat/wiki",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/mone/tcp-chat.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mone/tcp-chat/issues",
+    "email": "mone@tpatpc.it"
+  },
+  "author": {
+    "name": "Mone",
+    "email": "mone@tpatpc.it"
+  },
+  "files": [
+    "README.md",
+    "lib",
+    "server.js"
+  ],
+  "main": "server",
+  "directories": {
+    "lib": "./lib"
+  },
+  "engines": [
+    "node"
+  ],
+  "scripts": {
+    "test": "node run_tests.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "node-config": "0.0.2",
+    "es6-promise": "2.3.0",
+    "requirejs": "2.1.20",
+    "split": "1.0.0"
+  },
+  "devDependencies": {
+    "diveSync": "0.3.0",
+    "nodemon": "1.4.1",
+    "nodeunit": "0.9.1",
+    "groove": "2.3.2",
+    "through": "2.3.8"
+  }
+}
