@@ -125,7 +125,6 @@ exports.shouldEmitMessageLater = function(test){
 
     var fakeSocket = through(
       function write(data) {
-        console.log("HI********************************"+data)
         this.emit('data', data)
       },
       function end() {
@@ -190,7 +189,6 @@ exports.shouldNotWriteToClosedSocket = function(test){
     var client = new Client("test",fakeSocket);
 
     client.on("message",function(message) {
-      console.log(message+"************************")
       test.ok(false);
     });
 
