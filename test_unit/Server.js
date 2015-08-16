@@ -131,7 +131,6 @@ exports.shouldAcceptAndCloseClients = function(test){
 
 
     var wait = new CountDownLatch(2,{done:function(){
-      console.log("--****************************************["+server.getClientsCount())
       test.equals(0,server.getClientsCount());
       test.done();
 
