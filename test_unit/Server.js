@@ -124,7 +124,7 @@ exports.shouldAcceptAndCloseClients = function(test){
   requirejs(["./lib/Server","net","./lib/util/CountDownLatch"],
     function(Server,net,CountDownLatch) {
 
-    var port = nextPort;
+    var port = nextPort++;
     var server = new Server("test",port,true);
     var serverSocket = net.createServer();
     server.start(serverSocket);
@@ -143,22 +143,184 @@ exports.shouldAcceptAndCloseClients = function(test){
       }
     });
 
+    function onConnect() {
+      waitConn.countDown();
+    }
+    function onClose() {
+      wait.countDown();
+    }
+
     var socket = new net.Socket();
     socket.connect(port, "localhost");
-    socket.on("connect",function() {
-      waitConn.countDown();
+    socket.on("connect",onConnect);
+    socket.on("close",onClose);
+
+    var socket2 = new net.Socket();
+    socket2.connect(port, "localhost");
+    socket2.on("connect",onConnect);
+    socket2.on("close",onClose);
+  });
+};
+
+exports.shouldBroadcastToClients = function(test){
+  test.expect(2);
+
+  requirejs(["./lib/Server","net","./lib/util/CountDownLatch"],
+    function(Server,net,CountDownLatch) {
+
+    var port = nextPort++;
+    var server = new Server("test",port,true);
+    var serverSocket = net.createServer();
+    server.start(serverSocket);
+
+
+    var wait = new CountDownLatch(2,test);
+    var waitConn = new CountDownLatch(2,{
+      done: function() {
+        //clients are connected now, broadcast a message
+        server.broadcastMessage("my-message");
+      }
     });
-    socket.on("close",function() {
+
+    function onConnect() {
+      waitConn.countDown();
+    }
+    function onData(data) {
+      test.equals(data,"my-message\r\n");
       wait.countDown();
+    }
+
+    var socket = new net.Socket();
+    socket.connect(port, "localhost");
+    socket.on("connect",onConnect);
+    socket.on("data",onData);
+
+    var socket2 = new net.Socket();
+    socket2.connect(port, "localhost");
+    socket2.on("connect",onConnect);
+    socket2.on("data",onData);
+  });
+};
+
+exports.shouldBroadcastToClientsSurrogatePairs = function(test){
+  test.expect(2);
+
+  requirejs(["./lib/Server","net","./lib/util/CountDownLatch"],
+    function(Server,net,CountDownLatch) {
+
+    var port = nextPort++;
+    var server = new Server("test",port,true);
+    var serverSocket = net.createServer();
+    server.start(serverSocket);
+
+
+    var wait = new CountDownLatch(2,test);
+    var waitConn = new CountDownLatch(2,{
+      done: function() {
+        //clients are connected now, broadcast a message
+        server.broadcastMessage("☢42☢my-message");
+      }
+    });
+
+    function onConnect() {
+      waitConn.countDown();
+    }
+    function onData(data) {
+      test.equals(data,"☢42☢my-message\r\n");
+      wait.countDown();
+    }
+
+    var socket = new net.Socket();
+    socket.connect(port, "localhost");
+    socket.on("connect",onConnect);
+    socket.on("data",onData);
+
+    var socket2 = new net.Socket();
+    socket2.connect(port, "localhost");
+    socket2.on("connect",onConnect);
+    socket2.on("data",onData);
+  });
+};
+
+exports.shouldBroadcastToClientsAfterReceivingFromClient = function(test){
+  test.expect(2);
+
+  requirejs(["./lib/Server","net","./lib/util/CountDownLatch"],
+    function(Server,net,CountDownLatch) {
+
+    var port = nextPort++;
+    var server = new Server("test",port,true);
+    var serverSocket = net.createServer();
+    server.start(serverSocket);
+
+
+    var wait = new CountDownLatch(2,test);
+    var waitConn = new CountDownLatch(2,{
+      done: function() {
+        //clients are connected now, broadcast a message
+        socket.write("client-message\r\n");
+      }
+    });
+
+    function onConnect() {
+      waitConn.countDown();
+    }
+    function onData(data) {
+      test.equals(data,"client-message\r\n");
+      wait.countDown();
+    }
+
+    var socket = new net.Socket();
+    socket.connect(port, "localhost");
+    socket.on("connect",onConnect);
+    socket.on("data",onData);
+
+    var socket2 = new net.Socket();
+    socket2.connect(port, "localhost");
+    socket2.on("connect",onConnect);
+    socket2.on("data",onData);
+  });
+};
+
+exports.shouldBroadcastToClientsAfterReceivingFromClientAvoidingSenderClient = function(test){
+  test.expect(1);
+
+  requirejs(["./lib/Server","net","./lib/util/CountDownLatch"],
+    function(Server,net,CountDownLatch) {
+
+    var port = nextPort++;
+    var server = new Server("test",port,false);
+    var serverSocket = net.createServer();
+    server.start(serverSocket);
+
+    var waitConn = new CountDownLatch(2,{
+      done: function() {
+        //clients are connected now, broadcast a message
+        socket.write("client-message\r\n");
+      }
+    });
+
+    function onConnect() {
+      waitConn.countDown();
+    }
+
+    var socket = new net.Socket();
+    socket.connect(port, "localhost");
+    socket.on("connect",onConnect);
+    socket.on("data",function(data) {
+      test.ok(false);
+      test.done();
     });
 
     var socket2 = new net.Socket();
     socket2.connect(port, "localhost");
-    socket2.on("connect",function() {
-      waitConn.countDown();
-    });
-    socket2.on("close",function() {
-      wait.countDown();
+    socket2.on("connect",onConnect);
+    socket2.on("data", function(data) {
+      test.equals(data,"client-message\r\n");
+      setTimeout(function() {
+        test.done();
+      },100);
     });
   });
 };
+
