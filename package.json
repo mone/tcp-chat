@@ -39,13 +39,13 @@
     "node-config": "0.0.2",
     "es6-promise": "2.3.0",
     "requirejs": "2.1.20",
-    "split": "1.0.0"
+    "split": "1.0.0",
+    "config": "1.15.0"
   },
   "devDependencies": {
     "diveSync": "0.3.0",
     "nodemon": "1.4.1",
     "nodeunit": "0.9.1",
-    "groove": "2.3.2",
     "through": "2.3.8"
   }
 }

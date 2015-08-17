@@ -9,7 +9,7 @@ var groove = require('groove');
 
 
 function tryAgain() {
-  var playlist = groove.createPlaylist();
+  /*var playlist = groove.createPlaylist();
   var player = groove.createPlayer();
 
   groove.open("test_unit/try-again.mp3", function(err, file) {
@@ -29,7 +29,7 @@ function tryAgain() {
         file.close(function(){});
       }
     });
-  });
+  });*/
 }
 
 
