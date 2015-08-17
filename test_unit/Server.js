@@ -12,7 +12,7 @@ exports.shouldStartListen = function(test){
   requirejs(["./lib/Server","net"],
     function(Server,net) {
 
-    var server = new Server("test",nextPort++,true);
+    var server = new Server("test_shouldStartListen",nextPort++,true);
     server.start(net.createServer());
 
     server.on("listening",function() {
@@ -32,7 +32,7 @@ exports.shouldStopListen = function(test){
   requirejs(["./lib/Server","net"],
     function(Server,net) {
 
-    var server = new Server("test",nextPort++,true);
+    var server = new Server("test_shouldStopListen",nextPort++,true);
     server.start(net.createServer());
 
     server.on("listening",function() {
@@ -51,7 +51,7 @@ exports.shouldClose = function(test){
   requirejs(["./lib/Server","net"],
     function(Server,net) {
 
-    var server = new Server("test",nextPort++,true);
+    var server = new Server("test_shouldClose",nextPort++,true);
     var serverSocket = net.createServer();
     server.start(serverSocket);
 
@@ -73,7 +73,7 @@ exports.shouldAcceptClient = function(test){
     function(Server,net) {
 
     var port = nextPort++;
-    var server = new Server("test",port,true);
+    var server = new Server("test_shouldAcceptClient",port,true);
     var serverSocket = net.createServer();
     server.start(serverSocket);
 
@@ -96,7 +96,7 @@ exports.shouldAcceptClients = function(test){
     var wait = new CountDownLatch(2,test);
 
     var port = nextPort++;
-    var server = new Server("test",port,true);
+    var server = new Server("test_shouldAcceptClients",port,true);
     var serverSocket = net.createServer();
     server.start(serverSocket);
 
@@ -125,7 +125,7 @@ exports.shouldAcceptAndCloseClients = function(test){
     function(Server,net,CountDownLatch) {
 
     var port = nextPort++;
-    var server = new Server("test",port,true);
+    var server = new Server("test_shouldAcceptAndCloseClients",port,true);
     var serverSocket = net.createServer();
     server.start(serverSocket);
 
@@ -133,7 +133,6 @@ exports.shouldAcceptAndCloseClients = function(test){
     var wait = new CountDownLatch(2,{done:function(){
       test.equals(0,server.getClientsCount());
       test.done();
-
     }});
     var waitConn = new CountDownLatch(2,{
       done: function() {
@@ -143,8 +142,13 @@ exports.shouldAcceptAndCloseClients = function(test){
       }
     });
 
+
     function onConnect() {
-      waitConn.countDown();
+      //it looks like that the connect event can be fired before the related connection event on the server socket
+      //delay the call
+      setTimeout(function() {
+        waitConn.countDown();
+      },10);
     }
     function onClose() {
       wait.countDown();
@@ -169,7 +173,7 @@ exports.shouldBroadcastToClients = function(test){
     function(Server,net,CountDownLatch) {
 
     var port = nextPort++;
-    var server = new Server("test",port,true);
+    var server = new Server("test_shouldBroadcastToClients",port,true);
     var serverSocket = net.createServer();
     server.start(serverSocket);
 
@@ -183,7 +187,9 @@ exports.shouldBroadcastToClients = function(test){
     });
 
     function onConnect() {
-      waitConn.countDown();
+      setTimeout(function() {
+        waitConn.countDown();
+      },10);
     }
     function onData(data) {
       test.equals(data,"my-message\r\n");
@@ -210,7 +216,7 @@ exports.shouldBroadcastToClientsAndAlsoEmitTheEvent = function(test){
     function(Server,net,CountDownLatch) {
 
     var port = nextPort++;
-    var server = new Server("test",port,true);
+    var server = new Server("test_shouldBroadcastToClientsAndAlsoEmitTheEvent",port,true);
     var serverSocket = net.createServer();
     server.start(serverSocket);
 
@@ -224,7 +230,9 @@ exports.shouldBroadcastToClientsAndAlsoEmitTheEvent = function(test){
     });
 
     function onConnect() {
-      waitConn.countDown();
+      setTimeout(function() {
+        waitConn.countDown();
+      },10);
     }
     function onData(data) {
       test.equals(data,"my-message\r\n");
@@ -255,7 +263,7 @@ exports.shouldBroadcastToClientsSurrogatePairs = function(test){
     function(Server,net,CountDownLatch) {
 
     var port = nextPort++;
-    var server = new Server("test",port,true);
+    var server = new Server("test_shouldBroadcastToClientsSurrogatePairs",port,true);
     var serverSocket = net.createServer();
     server.start(serverSocket);
 
@@ -269,7 +277,9 @@ exports.shouldBroadcastToClientsSurrogatePairs = function(test){
     });
 
     function onConnect() {
-      waitConn.countDown();
+      setTimeout(function() {
+        waitConn.countDown();
+      },10);
     }
     function onData(data) {
       test.equals(data,"☢42☢my-message\r\n");
@@ -295,7 +305,7 @@ exports.shouldBroadcastToClientsAfterReceivingFromClient = function(test){
     function(Server,net,CountDownLatch) {
 
     var port = nextPort++;
-    var server = new Server("test",port,true);
+    var server = new Server("test_shouldBroadcastToClientsAfterReceivingFromClient",port,true);
     var serverSocket = net.createServer();
     server.start(serverSocket);
 
@@ -335,7 +345,7 @@ exports.shouldBroadcastToClientsAfterReceivingFromClientAvoidingSenderClient = f
     function(Server,net,CountDownLatch) {
 
     var port = nextPort++;
-    var server = new Server("test",port,false);
+    var server = new Server("test_shouldBroadcastToClientsAfterReceivingFromClientAvoidingSenderClient",port,false);
     var serverSocket = net.createServer();
     server.start(serverSocket);
 
