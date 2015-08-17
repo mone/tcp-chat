@@ -202,6 +202,52 @@ exports.shouldBroadcastToClients = function(test){
   });
 };
 
+
+exports.shouldBroadcastToClientsAndAlsoEmitTheEvent = function(test){
+  test.expect(3);
+
+  requirejs(["./lib/Server","net","./lib/util/CountDownLatch"],
+    function(Server,net,CountDownLatch) {
+
+    var port = nextPort++;
+    var server = new Server("test",port,true);
+    var serverSocket = net.createServer();
+    server.start(serverSocket);
+
+
+    var wait = new CountDownLatch(3,test);
+    var waitConn = new CountDownLatch(2,{
+      done: function() {
+        //clients are connected now, broadcast a message
+        server.broadcastMessage("my-message");
+      }
+    });
+
+    function onConnect() {
+      waitConn.countDown();
+    }
+    function onData(data) {
+      test.equals(data,"my-message\r\n");
+      wait.countDown();
+    }
+
+    var socket = new net.Socket();
+    socket.connect(port, "localhost");
+    socket.on("connect",onConnect);
+    socket.on("data",onData);
+
+    var socket2 = new net.Socket();
+    socket2.connect(port, "localhost");
+    socket2.on("connect",onConnect);
+    socket2.on("data",onData);
+
+    server.on("broadcast",function(data) {
+      test.equals(data,"my-message");
+      wait.countDown();
+    });
+  });
+};
+
 exports.shouldBroadcastToClientsSurrogatePairs = function(test){
   test.expect(2);
 
