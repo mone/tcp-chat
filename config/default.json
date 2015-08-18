@@ -6,15 +6,21 @@
     "forks": "auto"
   },
 
+  //ATM if local cluster is disabled cluster is not supported
   "cluster": {
     //remove the whole cluster element has the same effect as setting this false
     "enabled": false,
-    "upperLevelServer": "",
+    "upperLevelServerHost": "",
+    "upperLevelServerPort": 0,
     //either "go-on", that means ignore the fact that we're disconnected from the upper level,
     //or "stop" to close the listening socket until we get a new connection to the upper level
     "disconnectionPolicy": "go-on"
   },
 
+  //if this server is not facing the clients (ie is facing other servers) echoToSender must be false
   "echoToSender": true,
-  "port": 10000
+  "port": 10000,
+
+  "logLevel": "info",
+  "logFile": "log.log"
 }

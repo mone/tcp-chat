@@ -1,0 +1,7 @@
+{
+  "localCluster": {
+    "enabled": false
+  },
+  "echoToSender": true,
+  "port": 10000
+}

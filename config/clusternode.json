@@ -1,0 +1,17 @@
+{
+  "localCluster": {
+    "enabled": true,
+    "forks": "auto"
+  },
+
+  "cluster": {
+    "enabled": true,
+    "upperLevelServerHost": "localhost",
+    "upperLevelServerPort": 10001,
+    "disconnectionPolicy": "stop"
+  },
+
+  "echoToSender": true,
+  "port": 10000,
+  "logFile": "server1.log"
+}

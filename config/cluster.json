@@ -1,0 +1,12 @@
+{
+  "localCluster": {
+    "enabled": false,
+    "forks": "auto"
+  },
+  "cluster": {
+    "enabled": false
+  },
+  "echoToSender": false,
+  "port": 10001,
+  "logFile": "cluster.log"
+}
