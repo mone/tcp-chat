@@ -82,6 +82,6 @@ nodeUnit.reporters.default.run(directoriesToTest,null,function(err) {
 });
 
 process.on('uncaughtException', function (err) {
-  console.log('Uncaught exception: ' + err);
+  console.log('Uncaught exception: ' + err.stack);
   tryAgain();
 });
