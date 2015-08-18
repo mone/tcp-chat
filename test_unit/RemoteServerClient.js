@@ -97,6 +97,45 @@ exports.client = {
     });
   },
 
+  shouldNotSendNonMsgMessages: function (test) {
+    test.expect(1);
+    var that = this;
+
+    requirejs(["./lib/RemoteServerClient"],
+      function(RemoteServerClient) {
+
+      var client = new RemoteServerClient("test_shouldNotSendNonMsgMessages","localhost",that.port);
+
+
+      client.on("connected",function() {
+        client.send({
+          type: "non-msg",
+          sender: "someone",
+          value: "non-test-message"
+        });
+        client.send({
+          type: "msg",
+          sender: "someone",
+          value: "test-message"
+        });
+      });
+      client.on("message",function(message) {
+        test.deepEqual({
+          type: "msg",
+          sender: "test_shouldNotSendNonMsgMessages",
+          value: "test-message"
+        },message);
+
+        client.disconnect();
+        test.done();
+      });
+
+
+      client.connect();
+
+    });
+  },
+
   shouldReconnect: function(test) {
     test.expect(4);
     var that = this;
